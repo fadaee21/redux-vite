@@ -1,7 +1,7 @@
 import { useAppSelector } from "../../app/hooks";
 import { selectAllUsers } from "../users/usersSlice";
 interface Prop {
-  userId: string;
+  userId: string | number;
 }
 const PostAuthor = ({ userId }: Prop) => {
   const users = useAppSelector(selectAllUsers);

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { postAdded } from "./postsSlice";
+// import { postAdded } from "./postsSlice";
+import { Status, addPostNew } from "./postsSlice"; //async function
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectAllUsers } from "../users/usersSlice";
 
@@ -9,7 +10,11 @@ const AddPostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState("");
+  const [addReqState, setAddReqState] = useState<Status>("idle");
 
+  const canSave =
+    [title, content, userId].every(Boolean) && addReqState === "idle";
+  // const canSave = Boolean(title) && Boolean(content) && Boolean(userId);//before adding async func
   const users = useAppSelector(selectAllUsers);
   const onTitleChanged = (e: React.ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value);
@@ -19,13 +24,25 @@ const AddPostForm = () => {
     setUserId(e.target.value);
 
   const onSavePostClicked = () => {
-    if (title && content) {
-      dispatch(postAdded(title, content, userId));
-      setTitle("");
-      setContent("");
+    // if (title && content) {
+    //   dispatch(postAdded(title, content, userId));
+    //   setTitle("");
+    //   setContent("");
+    // }//before adding async func
+    if (canSave) {
+      try {
+        setAddReqState("loading");
+        dispatch(addPostNew({ title, body: content, userId })).unwrap();
+        setTitle("");
+        setContent("");
+        setUserId("");
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setAddReqState("idle");
+      }
     }
   };
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userId);
 
   const usersOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
